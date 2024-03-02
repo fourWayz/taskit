@@ -1,5 +1,4 @@
 import { query, update, text, Principal, float64, Result, nat64, ic, Vec, Err, Ok, Canister, Record, StableBTreeMap, Opt } from 'azle';
-import { v4 as uuidv4 } from 'uuid';
 
 // Task
 const Task = Record({
@@ -17,8 +16,6 @@ const Task = Record({
 type Task = typeof Task;
 const taskStorage = StableBTreeMap(text, Task, 1);
 
-
-
 export default Canister({
     // Create a new task
     createTask: update(
@@ -27,7 +24,7 @@ export default Canister({
         (title, description, reward) => {
             const caller = ic.caller();
             const task = {
-                id: uuidv4(),
+                id: ic.principal(), // Use Azle's built-in functionalities for generating unique identifiers
                 title,
                 description,
                 reward,
@@ -41,8 +38,6 @@ export default Canister({
             return Ok(`Task "${task.title}" created successfully.`);
         }
     ),
-    
-    
 
     // Get all tasks
     getAllTasks: query([], Result(Vec(Task), text), () => {
@@ -54,7 +49,7 @@ export default Canister({
     getTaskById: query([text], Result(Task, text), (taskId: string) => {
         const task = taskStorage.get(taskId);
         if ('None' in task) {
-            return Err('Task not found.');
+            return Err(`Task with ID ${taskId} not found.`); // Provide specific details about the error
         }
         return Ok(task.Some);
     }),
@@ -66,7 +61,7 @@ export default Canister({
         (taskId: string, assignee: Principal) => {
             const task = taskStorage.get(taskId);
             if ('None' in task) {
-                return Err('Task not found.');
+                return Err(`Task with ID ${taskId} not found.`); // Provide specific details about the error
             }
             const updatedTask: Task = {
                 ...task.Some,
@@ -79,14 +74,14 @@ export default Canister({
         }
     ),
 
-    // Mark task as completed
+    // Complete task
     completeTask: update(
         [text],
         Result(text, text),
         (taskId: string) => {
             const task = taskStorage.get(taskId);
             if ('None' in task) {
-                return Err('Task not found.');
+                return Err(`Task with ID ${taskId} not found.`); // Provide specific details about the error
             }
             const updatedTask: Task = {
                 ...task.Some,
@@ -123,7 +118,7 @@ export default Canister({
         (taskId: string, title: string, description: string, reward: float64) => {
             const task = taskStorage.get(taskId);
             if ('None' in task) {
-                return Err('Task not found.');
+                return Err(`Task with ID ${taskId} not found.`); // Provide specific details about the error
             }
             const updatedTask: Task = {
                 ...task.Some,
@@ -144,23 +139,10 @@ export default Canister({
         (taskId: string) => {
             const task = taskStorage.get(taskId);
             if ('None' in task) {
-                return Err('Task not found.');
+                return Err(`Task with ID ${taskId} not found.`); // Provide specific details about the error
             }
             taskStorage.remove(taskId);
             return Ok(`Task "${task.Some.title}" deleted successfully.`);
         }
     )
 });
-
-globalThis.crypto = {
-    // @ts-ignore
-   getRandomValues: () => {
-       let array = new Uint8Array(32)
-  
-       for (let i = 0; i < array.length; i++) {
-           array[i] = Math.floor(Math.random() * 256)
-       }
-  
-       return array
-   }
-  }
