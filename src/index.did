@@ -1,0 +1,12 @@
+service: () -> {
+    assignTask: (text, principal) -> (variant {Ok:text; Err:text});
+    completeTask: (text) -> (variant {Ok:text; Err:text});
+    createTask: (text, text, float64) -> (variant {Ok:text; Err:text});
+    deleteTask: (text) -> (variant {Ok:text; Err:text});
+    getAllTasks: () -> (variant {Ok:vec record {id:text; status:text; reward:float64; title:text; assignedTo:opt principal; createdAt:nat64; description:text; updatedAt:opt nat64; poster:principal}; Err:text}) query;
+    getTaskById: (text) -> (variant {Ok:record {id:text; status:text; reward:float64; title:text; assignedTo:opt principal; createdAt:nat64; description:text; updatedAt:opt nat64; poster:principal}; Err:text}) query;
+    getTasksByAssignee: (principal) -> (variant {Ok:vec record {id:text; status:text; reward:float64; title:text; assignedTo:opt principal; createdAt:nat64; description:text; updatedAt:opt nat64; poster:principal}; Err:text}) query;
+    getTasksByPoster: (principal) -> (variant {Ok:vec record {id:text; status:text; reward:float64; title:text; assignedTo:opt principal; createdAt:nat64; description:text; updatedAt:opt nat64; poster:principal}; Err:text}) query;
+    getTasksByStatus: (text) -> (variant {Ok:vec record {id:text; status:text; reward:float64; title:text; assignedTo:opt principal; createdAt:nat64; description:text; updatedAt:opt nat64; poster:principal}; Err:text}) query;
+    updateTask: (text, text, text, float64) -> (variant {Ok:text; Err:text});
+}
